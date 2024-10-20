@@ -239,11 +239,15 @@ fn create_property_table(
 // the resource files that should be included in the package.
 fn collect_resource_info(settings: &Settings) -> crate::Result<Vec<ResourceInfo>> {
     let mut resources = Vec::<ResourceInfo>::new();
+    let mut binary_path = settings.binary_path().to_path_buf();
+    if !binary_path.ends_with(".exe") {
+        binary_path.set_extension("exe");
+    }
     resources.push(ResourceInfo {
-        source_path: settings.binary_path().to_path_buf(),
-        dest_path: PathBuf::from(settings.binary_name()),
-        filename: settings.binary_name().to_string(),
-        size: settings.binary_path().metadata()?.len(),
+        source_path: binary_path.clone(),
+        dest_path: PathBuf::from(binary_path.file_name().unwrap()),
+        filename: binary_path.file_name().unwrap().to_string_lossy().to_string(),
+        size: binary_path.metadata()?.len(),
         component_key: String::new(),
     });
     let root_rsrc_dir = PathBuf::from("Resources");
